@@ -1,8 +1,0 @@
-GameProject {
- ID "SESOFCompass"
- GUID "5F0CA2820542039B"
- TITLE "SESOF Compass"
- Dependencies {
-  "58D0FB3206B6F859"
- }
-}
