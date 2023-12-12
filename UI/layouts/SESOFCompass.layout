@@ -1,0 +1,195 @@
+FrameWidgetClass {
+ Name "SESOFCompass"
+ {
+  FrameWidgetClass "{5F187D0135CCA074}" {
+   Name "SESOFCompassImageOnly"
+   Slot FrameWidgetSlot "{5F187D012FC1433B}" {
+    Anchor 0.5 1 0.5 1
+    PositionX -180
+    OffsetLeft -180
+    PositionY -40
+    OffsetTop -40
+    SizeX 360
+    OffsetRight -180
+    SizeY 40
+    OffsetBottom 0
+   }
+   Clipping True
+   {
+    ImageWidgetClass "{5F187D0173167293}" {
+     Name "SESOFCompassImageOnlyImage"
+     Slot FrameWidgetSlot "{5F0CE61F9E9BB3DB}" {
+      Anchor 0.5 0 0.5 0
+      PositionX -719.5
+      OffsetLeft -719.5
+      PositionY 0
+      OffsetTop 0
+      SizeX 1440
+      OffsetRight -720.5
+      SizeY 25
+      OffsetBottom -25
+     }
+     Clipping True
+     "Ignore Cursor" 0
+     Texture "{8C56C832E9405428}UI/layouts/SESOF_CompassImage.edds"
+     Size 8640 149
+     "Transition width" 0
+     Progress 0.016
+     "Mask Mode" "Include Below"
+     "Shadow Color" 0.973 0.973 0.973 1
+    }
+    TextWidgetClass "{5F187D017316727D}" {
+     Name "SESOFCompassImageOnlyIndicator"
+     Slot FrameWidgetSlot "{5F108727DD8189D4}" {
+      Anchor 0.5 0 0.5 0
+      PositionX -5
+      OffsetLeft -5
+      PositionY 28
+      OffsetTop 28
+      SizeX 10
+      OffsetRight -5
+      SizeY 9
+      OffsetBottom -37
+     }
+     Opacity 0.696
+     Text "^"
+     "Font Size" 15
+     "Min Font Size" 15
+     "Horizontal Alignment" Center
+    }
+   }
+  }
+  FrameWidgetClass "{5F187D012FC14316}" {
+   Name "SESOFCompassBearingOnly"
+   Slot FrameWidgetSlot "{5F187D012FC1433B}" {
+    Anchor 0.5 1 0.5 1
+    PositionX -35
+    OffsetLeft -35
+    PositionY -37
+    OffsetTop -37
+    SizeX 70
+    OffsetRight -35
+    SizeY 40
+    OffsetBottom -3
+   }
+   "Is Visible" 0
+   {
+    TextWidgetClass "{5F17604C60833DEA}" {
+     Name "SESOFCompassBearingOnlyDirection"
+     Slot FrameWidgetSlot "{5F17604FF7A40781}" {
+      Anchor 0.5 1 0.5 1
+      PositionX -10
+      OffsetLeft -10
+      PositionY -35
+      OffsetTop -35
+      SizeX 20
+      OffsetRight -10
+      SizeY 20
+      OffsetBottom 15
+     }
+     Text "SE"
+     "Font Size" 15
+     "Min Font Size" 15
+     "Horizontal Alignment" Center
+    }
+    TextWidgetClass "{5F0CA28359BA69B3}" {
+     Name "SESOFCompassBearingOnlyBearing"
+     Slot FrameWidgetSlot "{5F17604FF7A407D5}" {
+      Anchor 0.5 1 0.5 1
+      PositionX -16
+      OffsetLeft -16
+      PositionY -20
+      OffsetTop -20
+      SizeX 32
+      OffsetRight -16
+      SizeY 20
+      OffsetBottom 0
+     }
+     Text "000"
+     "Font Size" 15
+     "Min Font Size" 15
+     "Horizontal Alignment" Center
+    }
+   }
+  }
+  FrameWidgetClass "{5F0CE61E374FFC65}" {
+   Name "SESOFCompassImageAndBearing"
+   Slot FrameWidgetSlot "{5F0CE61E374FFC0B}" {
+    Anchor 0.5 1 0.5 1
+    PositionX -180
+    OffsetLeft -180
+    PositionY -50
+    OffsetTop -50
+    SizeX 360
+    OffsetRight -180
+    SizeY 50
+    OffsetBottom 0
+   }
+   "Is Visible" 0
+   Clipping True
+   "Left rule" Stop
+   "Right rule" Stop
+   {
+    ImageWidgetClass "{5F0CE61F9E9BB237}" {
+     Name "SESOFCompassImageAndBearingImage"
+     Slot FrameWidgetSlot "{5F0CE61F9E9BB3DB}" {
+      Anchor 0.5 0 0.5 0
+      PositionX -719.5
+      OffsetLeft -719.5
+      PositionY 0
+      OffsetTop 0
+      SizeX 1440
+      OffsetRight -720.5
+      SizeY 25
+      OffsetBottom -25
+     }
+     Clipping True
+     "Ignore Cursor" 0
+     Texture "{8C56C832E9405428}UI/layouts/SESOF_CompassImage.edds"
+     Size 8640 149
+     "Transition width" 0
+     Progress 0.016
+     "Mask Mode" "Include Below"
+     "Shadow Color" 0.973 0.973 0.973 1
+    }
+    TextWidgetClass "{5F108727DD8189CE}" {
+     Name "SESOFCompassImageAndBearingIndicator"
+     Slot FrameWidgetSlot "{5F108727DD8189D4}" {
+      Anchor 0.5 0 0.5 0
+      PositionX -5
+      OffsetLeft -5
+      PositionY 28
+      OffsetTop 28
+      SizeX 10
+      OffsetRight -5
+      SizeY 9
+      OffsetBottom -37
+     }
+     Opacity 0.696
+     Text "^"
+     "Font Size" 15
+     "Min Font Size" 15
+     "Horizontal Alignment" Center
+    }
+    TextWidgetClass "{5F187D050C59360F}" {
+     Name "SESOFCompassImageAndBearingBearing"
+     Slot FrameWidgetSlot "{5F187D050C593614}" {
+      Anchor 0.5 1 0.5 1
+      PositionX -15
+      OffsetLeft -15
+      PositionY -12
+      OffsetTop -12
+      SizeX 30
+      OffsetRight -15
+      SizeY 30
+      OffsetBottom -18
+     }
+     Text "000"
+     "Font Size" 10
+     "Min Font Size" 10
+     "Horizontal Alignment" Center
+    }
+   }
+  }
+ }
+}

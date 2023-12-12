@@ -1,0 +1,18 @@
+MetaFileClass {
+ Name "{74C51B7CDF1E903C}UI/layouts/SESOF_Compass.layout"
+ Configurations {
+  LayoutResourceClass PC {
+   BuildTags {
+    ""
+   }
+  }
+  LayoutResourceClass XBOX_ONE : PC {
+  }
+  LayoutResourceClass XBOX_SERIES : PC {
+  }
+  LayoutResourceClass PS4 : PC {
+  }
+  LayoutResourceClass HEADLESS : PC {
+  }
+ }
+}

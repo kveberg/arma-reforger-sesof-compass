@@ -1,0 +1,12 @@
+SCR_PlayerController {
+ ID "1A9BA6BEFA06E3B1"
+ components {
+  SCR_HUDManagerComponent "{2FDC275D9EBCDB8B}" {
+   InfoDisplays {
+    SESOFCompass "{5F18B94D49136FF8}" {
+     m_LayoutPath "{74C51B7CDF1E903C}UI/layouts/SESOFCompass.layout"
+    }
+   }
+  }
+ }
+}
