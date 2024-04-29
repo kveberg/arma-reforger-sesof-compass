@@ -1,38 +1,26 @@
+//---------------------------------------------------------------------------
 class SESOFCompass: SCR_InfoDisplay
 {
+	//---------------------------------------------------------------------------
 	private World world = GetGame().GetWorld();
 	
 	// Compass: Image
-	private FrameWidget SESOFCompassImageOnly = null;
-	private ImageWidget SESOFCompassImageOnlyImage = null;
+	private FrameWidget SESOFCompassImageOnly;
+	private ImageWidget SESOFCompassImageOnlyImage;
 	
 	// Compass: Bearing
-	private FrameWidget SESOFCompassBearingOnly = null;
-	private TextWidget SESOFCompassBearingOnlyBearing = null;
-	private TextWidget SESOFCompassBearingOnlyDirection = null;
+	private FrameWidget SESOFCompassBearingOnly;
+	private TextWidget SESOFCompassBearingOnlyBearing;
+	private TextWidget SESOFCompassBearingOnlyDirection;
 	
 	// Compass Image & Bearing
-	private FrameWidget SESOFCompassImageAndBearing = null;
-	private ImageWidget SESOFCompassImageAndBearingImage = null;
-	private TextWidget SESOFCompassImageAndBearingBearing = null;
+	private FrameWidget SESOFCompassImageAndBearing;
+	private ImageWidget SESOFCompassImageAndBearingImage;
+	private TextWidget SESOFCompassImageAndBearingBearing;
 	
-	// Bools to switch between things
-	private bool showCompass = true;
-	private bool showCompassImage = true;
-	private bool showCompassBearing = false;
+	private bool showCompass = false;
 	private bool compassImageDiscrete = false;
-	
-	override protected void OnInit(IEntity owner)
-	{
-		super.OnInit(owner);
-		
-		InitCompass();
-		
-		GetGame().GetInputManager().AddActionListener("SESOFCompassToggle", EActionTrigger.DOWN, ToggleCompass);
-		GetGame().GetInputManager().AddActionListener("SESOFCompassToggleType", EActionTrigger.DOWN, ToggleCompassType);
-		GetGame().GetInputManager().AddActionListener("SESOFCompassDiscreteBearings", EActionTrigger.DOWN, ToggleDiscreteBearings);
-	}
-	
+	private int currentCompassType = 0;
 	
 	override protected void UpdateValues(IEntity owner, float timeSlice)
 	{
@@ -40,7 +28,7 @@ class SESOFCompass: SCR_InfoDisplay
 		
 		if (!world) return;
 		
-		// Fetch widgets if we haven't already.
+		// Fetch widgets and initialise compass on the first update.
 		if (!SESOFCompassImageOnly) 
 		{
 			// Compass: Image
@@ -56,20 +44,26 @@ class SESOFCompass: SCR_InfoDisplay
 			SESOFCompassImageAndBearing = FrameWidget.Cast(m_wRoot.FindAnyWidget("SESOFCompassImageAndBearing"));
 			SESOFCompassImageAndBearingImage = ImageWidget.Cast(m_wRoot.FindAnyWidget("SESOFCompassImageAndBearingImage"));
 			SESOFCompassImageAndBearingBearing = TextWidget.Cast(m_wRoot.FindAnyWidget("SESOFCompassImageAndBearingBearing"));
+			
+			LoadCompassConfig();	
+			GetGame().GetInputManager().AddActionListener("SESOFCompassToggle", EActionTrigger.DOWN, ToggleCompass);
 		}
-		UpdateCompass();
+		
+		// Update the compass
+		UpdateCompassValues();
 	}
 	
 	
-	private void UpdateCompass()
+	private void UpdateCompassValues()
 	{
 		if (!showCompass) {return;}
+		if (currentCompassType == 0) {return;}
 		
 		// Get yaw
 		float yaw = GetYaw();
 
 		// Compass: Image
-		if (showCompassImage && !showCompassBearing)
+		if (currentCompassType == 3)
 		{
 			if (!compassImageDiscrete)
 			{
@@ -77,8 +71,7 @@ class SESOFCompass: SCR_InfoDisplay
 				if (yaw < 245) {compassImagePosX = -720 - (yaw * 2)};
 				if (yaw > 244) {compassImagePosX = -(yaw * 2)};
 				FrameSlot.SetPosX(SESOFCompassImageOnlyImage, compassImagePosX)
-			}
-			
+			}		
 			if (compassImageDiscrete)
 			{
 				float compassImagePosX
@@ -86,6 +79,7 @@ class SESOFCompass: SCR_InfoDisplay
 				if (Math.Round(yaw) > 244) {compassImagePosX = -(Math.Round(yaw) * 2)};
 				FrameSlot.SetPosX(SESOFCompassImageOnlyImage, compassImagePosX)
 			}
+			return;
 		}
 		
 		// Get direction and set up prefix of zeroes to draw bearing nicely
@@ -95,25 +89,24 @@ class SESOFCompass: SCR_InfoDisplay
 		if (Math.Round(yaw) >= 10 & Math.Round(yaw) < 100) {yawTextPrefix = "0";}
 		
 		// Compass: Bearing
-		if (showCompassBearing && !showCompassImage)
+		if (currentCompassType == 1)
 		{
 			SESOFCompassBearingOnlyBearing.SetText(yawTextPrefix + Math.Round(yaw).ToString());
 			SESOFCompassBearingOnlyDirection.SetText(direction);
+			return;
 		}
-		
+
 		// Compass Image & Bearing
-		if (showCompassImage && showCompassBearing)
+		if (currentCompassType == 2)
 		{
 			SESOFCompassImageAndBearingBearing.SetText(yawTextPrefix + Math.Round(yaw).ToString());
-			
 			if (!compassImageDiscrete)
 			{
 				float compassImagePosX
 				if (yaw < 245) {compassImagePosX = -720 - (yaw * 2)};
 				if (yaw > 244) {compassImagePosX = -(yaw * 2)};
 				FrameSlot.SetPosX(SESOFCompassImageAndBearingImage, compassImagePosX)
-			}
-			
+			}			
 			if (compassImageDiscrete)
 			{
 				float compassImagePosX
@@ -121,116 +114,9 @@ class SESOFCompass: SCR_InfoDisplay
 				if (Math.Round(yaw) > 244) {compassImagePosX = -(Math.Round(yaw) * 2)};
 				FrameSlot.SetPosX(SESOFCompassImageAndBearingImage, compassImagePosX)
 			}
-		}
-	}
-	
-
-	
-	// HELPERS BELOW HERE
-	private void InitCompass()
-	{
-		Print("Compass initialised.");
-		showCompass = true;
-		showCompassImage = true;
-		showCompassBearing = false;
-	}
-	
-	
-	private void ToggleCompassType()
-	{
-		if (showCompass)
-		{
-			// Compass: From Image to Bearing
-			if (showCompassImage && !showCompassBearing)
-			{
-				SESOFCompassImageOnly.SetVisible(false);
-				SESOFCompassBearingOnly.SetVisible(true);
-				SESOFCompassImageAndBearing.SetVisible(false);
-				
-				showCompassImage = false;
-				showCompassBearing = true;
-				
-				Print("Compass type: Bearing");
-				return;
-			}
-			// Compass: From Bearing to Image and Bearing
-			if (!showCompassImage && showCompassBearing)
-			{	
-				SESOFCompassImageOnly.SetVisible(false);
-				SESOFCompassBearingOnly.SetVisible(false);
-				SESOFCompassImageAndBearing.SetVisible(true);
-				
-				showCompassImage = true;
-				showCompassBearing = true;
-				
-				Print("Compass type: Image and Bearing");
-				return;
-			}
-			// Compass: From Image and Bearing to just Image
-			if (showCompassImage && showCompassBearing)
-			{
-				SESOFCompassImageOnly.SetVisible(true);
-				SESOFCompassBearingOnly.SetVisible(false);
-				SESOFCompassImageAndBearing.SetVisible(false);
-				
-				showCompassImage = true;
-				showCompassBearing = false;
-				
-				Print("Compass type: Image");
-				return;
-			}
-		}
-	}
-	
-	
-	private void ToggleDiscreteBearings()
-	{
-		compassImageDiscrete = !compassImageDiscrete;
-	}
-	
-	
-	private void ToggleCompass()
-	{
-		// Hide the compass
-		if (showCompass)
-		{
-			showCompass = false;
 			
-			SESOFCompassImageOnly.SetVisible(false);
-			SESOFCompassBearingOnly.SetVisible(false);
-			SESOFCompassImageAndBearing.SetVisible(false);
-			Print("Compass hidden.");
-
 			return;
 		}
-		
-		// Show the compass
-		if (!showCompass)
-		{
-			// Using the toggle-function requires the bools to be set to the previous slot
-			showCompass = true;
-			
-			if (showCompassImage && !showCompassBearing)
-			{
-				SESOFCompassImageOnly.SetVisible(true);
-				SESOFCompassBearingOnly.SetVisible(false);
-				SESOFCompassImageAndBearing.SetVisible(false);
-			}
-			if (!showCompassImage && showCompassBearing)
-			{
-				SESOFCompassImageOnly.SetVisible(false);
-				SESOFCompassBearingOnly.SetVisible(true);
-				SESOFCompassImageAndBearing.SetVisible(false);
-			}
-			if (showCompassImage && showCompassBearing)
-			{
-				SESOFCompassImageOnly.SetVisible(false);
-				SESOFCompassBearingOnly.SetVisible(false);
-				SESOFCompassImageAndBearing.SetVisible(true);
-			}
-			Print("Compass shown.");
-		}
-		
 	}
 	
 	
@@ -254,5 +140,172 @@ class SESOFCompass: SCR_InfoDisplay
 		float yaw = Math3D.MatrixToAngles(transform)[0];
 		if (yaw < 0) {yaw = 360 - Math.AbsFloat(yaw);}
 		return yaw;
+	}
+		
+
+	// Shows / hides compass
+	private void ToggleCompass()
+	{
+		if (!showCompass)
+		{
+			showCompass = true;
+			
+			GetGame().GetInputManager().AddActionListener("SESOFCompassToggleType", EActionTrigger.DOWN, ToggleCompassType);
+			GetGame().GetInputManager().AddActionListener("SESOFCompassDiscreteBearings", EActionTrigger.DOWN, ToggleDiscreteBearings);
+			
+			ShowCompassType(currentCompassType);
+			SaveCompassConfig();
+			return;
+		}
+		
+		if (showCompass) 
+		{
+			showCompass = false;
+			
+			GetGame().GetInputManager().RemoveActionListener("SESOFCompassToggleType", EActionTrigger.DOWN, ToggleCompassType);
+			GetGame().GetInputManager().RemoveActionListener("SESOFCompassDiscreteBearings", EActionTrigger.DOWN, ToggleDiscreteBearings);
+			
+			ShowCompassType(0);
+			SaveCompassConfig();
+		}
+	}
+	
+
+	// Toggles between the three available types
+	private void ToggleCompassType()
+	{
+		currentCompassType += 1;
+		if (currentCompassType == 4) {currentCompassType = 1;}
+		ShowCompassType(currentCompassType);
+		SaveCompassConfig();
+	}
+	
+	
+	// More clickety-feel if discreet.
+	private void ToggleDiscreteBearings()
+	{
+		compassImageDiscrete = !compassImageDiscrete;
+		SaveCompassConfig();
+	}
+	
+	
+	// Shows/hides different compass types including hiding them all.
+	private void ShowCompassType(int compassType)
+	{	
+		// Hide
+		if (compassType == 0)
+		{
+			SESOFCompassImageOnly.SetVisible(false);
+			SESOFCompassBearingOnly.SetVisible(false);
+			SESOFCompassImageAndBearing.SetVisible(false);
+		}
+		
+		// Bearing only
+		if (compassType == 1)
+		{
+			SESOFCompassImageOnly.SetVisible(false);
+			SESOFCompassBearingOnly.SetVisible(true);
+			SESOFCompassImageAndBearing.SetVisible(false);		
+		}
+		
+		// Image with bearing below
+		if (compassType == 2)
+		{
+			SESOFCompassImageOnly.SetVisible(false);
+			SESOFCompassBearingOnly.SetVisible(false);
+			SESOFCompassImageAndBearing.SetVisible(true);			
+		}
+	
+		// Image only
+		if (compassType == 3)
+		{
+			SESOFCompassImageOnly.SetVisible(true);
+			SESOFCompassBearingOnly.SetVisible(false);
+			SESOFCompassImageAndBearing.SetVisible(false);
+		}	
+	}
+
+	
+	private void SaveCompassConfig()
+	{
+		//Print("Saving compass config.");
+		SESOFCompassConfig configFile = new SESOFCompassConfig();
+		
+		configFile.compassType = currentCompassType;
+		configFile.showDiscreteBearings = compassImageDiscrete;
+		configFile.showCompass = showCompass;
+		configFile.touched = true;
+		
+		configFile.SaveToFile("SESOFCompassConfig.json");
+		
+		Print("Saved currentCompassType: " + currentCompassType);
+		Print("Saved showDiscreteBearings: " + compassImageDiscrete);
+		Print("Saved showCompass: " + showCompass);
+	}
+	
+	
+	private void LoadCompassConfig()
+	{
+		//Print("Loading compass config.");
+		SESOFCompassConfig configFile = new SESOFCompassConfig();
+		
+		// LoadFromFile simply fails silently, so added a touched-variable to enable checks.
+		configFile.LoadFromFile("SESOFCompassConfig.json");
+		if (configFile.touched == 0) 
+		{
+			Print("SESOF Compass Failed to load config. Creating new default.");
+			showCompass = true;
+			currentCompassType = 3;
+			compassImageDiscrete = false;
+			SaveCompassConfig();
+			//configFile.LoadFromFile("SESOFCompassConfig.json");
+			LoadCompassConfig();
+		}
+
+		currentCompassType = configFile.compassType;	
+		if (configFile.showCompass == 1) {showCompass = true;}
+		if (configFile.showDiscreteBearings == 1) {compassImageDiscrete = true;}
+		
+			
+		Print("Loaded currentCompassType: " + currentCompassType);
+		Print("Loaded showDiscreteBearings: " + compassImageDiscrete);
+		Print("Loaded showCompass: " + showCompass);
+		
+		if (showCompass)
+		{
+			Print("Loaded config with compass on.");
+			GetGame().GetInputManager().AddActionListener("SESOFCompassToggleType", EActionTrigger.DOWN, ToggleCompassType);
+			GetGame().GetInputManager().AddActionListener("SESOFCompassDiscreteBearings", EActionTrigger.DOWN, ToggleDiscreteBearings);
+			
+			Print("Showing compass type " + currentCompassType);
+			ShowCompassType(currentCompassType);
+		}
+		
+		if (!showCompass) 
+		{
+			Print("Loaded config with compass off.");
+			GetGame().GetInputManager().RemoveActionListener("SESOFCompassToggleType", EActionTrigger.DOWN, ToggleCompassType);
+			GetGame().GetInputManager().RemoveActionListener("SESOFCompassDiscreteBearings", EActionTrigger.DOWN, ToggleDiscreteBearings);
+			
+			ShowCompassType(0);
+		}
+	}
+}
+
+
+class SESOFCompassConfig : JsonApiStruct
+{
+	int compassType;
+	bool showDiscreteBearings;
+	bool showCompass;
+	bool touched = false;
+
+
+	void SESOFCompassConfig()
+	{
+		RegV("compassType");
+		RegV("showDiscreteBearings");
+		RegV("showCompass");
+		RegV("touched");
 	}
 }
